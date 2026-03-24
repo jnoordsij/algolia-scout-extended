@@ -20,41 +20,24 @@ use Algolia\ScoutExtended\Searchable\ModelsResolver;
 use Algolia\ScoutExtended\Searchable\ObjectIdEncrypter;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
-use Laravel\Scout\Engines\Algolia3Engine;
-use Laravel\Scout\Scout;
-use function is_array;
 use Laravel\Scout\Builder;
-
-if (version_compare(Scout::VERSION, '10.11.6', '>=')) {
-    // New Laravel Scout base class for Algolia
-    class_alias(Algolia3Engine::class, BaseAlgoliaEngine::class);
-} else {
-    // Legacy Laravel Scout class
-    class_alias(\Laravel\Scout\Engines\AlgoliaEngine::class, BaseAlgoliaEngine::class);
-}
+use Laravel\Scout\Engines\AlgoliaEngine as BaseAlgoliaEngine;
 
 class AlgoliaEngine extends BaseAlgoliaEngine
 {
     /**
-     * The Algolia client.
-     *
-     * @var \Algolia\AlgoliaSearch\SearchClient
-     */
-    protected $algolia;
-
-    /**
      * Create a new engine instance.
      *
-     * @param  \Algolia\AlgoliaSearch\SearchClient $algolia
+     * @param  \Algolia\AlgoliaSearch\Api\SearchClient $algolia
      * @return void
      */
     public function __construct(SearchClient $algolia)
     {
-        $this->algolia = $algolia;
+        parent::__construct($algolia);
     }
 
     /**
-     * @param \Algolia\AlgoliaSearch\SearchClient $algolia
+     * @param \Algolia\AlgoliaSearch\Api\SearchClient $algolia
      *
      * @return void
      */
@@ -66,7 +49,7 @@ class AlgoliaEngine extends BaseAlgoliaEngine
     /**
      * Get the client.
      *
-     * @return \Algolia\AlgoliaSearch\SearchClient $algolia
+     * @return \Algolia\AlgoliaSearch\Api\SearchClient
      */
     public function getClient(): SearchClient
     {
@@ -115,6 +98,40 @@ class AlgoliaEngine extends BaseAlgoliaEngine
     public function flush($model)
     {
         $this->algolia->clearObjects($model->searchableAs());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function deleteIndex($name)
+    {
+        return $this->algolia->deleteIndex($name);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function updateIndexSettings(string $name, array $settings = [])
+    {
+        $this->algolia->setSettings($name, $settings);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function performSearch(Builder $builder, array $options = [])
+    {
+        $indexName = $builder->index ?: $builder->model->searchableAs();
+        $options = array_merge($builder->options, $options);
+
+        if ($builder->callback) {
+            return call_user_func($builder->callback, $this->algolia, $builder->query, $options);
+        }
+
+        return $this->algolia->searchSingleIndex(
+            $indexName,
+            array_merge(['query' => $builder->query], $options)
+        );
     }
 
     /**

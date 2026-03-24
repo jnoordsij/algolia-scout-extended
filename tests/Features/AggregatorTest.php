@@ -27,49 +27,40 @@ class AggregatorTest extends TestCase
     {
         $this->app['config']->set('scout.algolia.use_deprecated_delete_by', false);
 
-        $usersIndexMock = $this->mockIndex('users');
+        $client = $this->mockIndex('users');
 
-        $usersIndexMock->shouldReceive('saveObjects')->once()->with(Mockery::on(function ($argument) {
+        $client->shouldReceive('saveObjects')->once()->with('users', Mockery::on(function ($argument) {
             return count($argument) === 1 && array_key_exists('email', $argument[0]) &&
                 $argument[0]['objectID'] === 'App\User::1';
         }));
 
         $user = factory(User::class)->create();
 
-        $usersIndexMock->shouldReceive('browseObjects')->once()->with([
-            'attributesToRetrieve' => [
-                'objectID',
-            ],
-            'tagFilters' => [
-                ['App\User::1'],
-            ],
+        $client->shouldReceive('browseObjects')->once()->with('users', [
+            'attributesToRetrieve' => ['objectID'],
+            'tagFilters' => [['App\User::1']],
             // NOTE: This _should_ ideally return an instance of `\Algolia\AlgoliaSearch\Iterators\ObjectIterator`
             //       but mocking that class is not feasible as it has been declared `final`.
-        ])->andReturn([
-            ['objectID' => 'App\User::1'],
-        ]);
-        $usersIndexMock->shouldReceive('deleteObjects')->once()->with([
-            'App\User::1',
-        ]);
+        ])->andReturn([['objectID' => 'App\User::1']]);
+
+        $client->shouldReceive('deleteObjects')->once()->with('users', ['App\User::1']);
 
         $user->delete();
     }
 
     public function testWhenAggregagorIsNotBootedWithDeprecatedDeleteBy(): void
     {
-        $usersIndexMock = $this->mockIndex('users');
+        $client = $this->mockIndex('users');
 
-        $usersIndexMock->shouldReceive('saveObjects')->once()->with(Mockery::on(function ($argument) {
+        $client->shouldReceive('saveObjects')->once()->with('users', Mockery::on(function ($argument) {
             return count($argument) === 1 && array_key_exists('email', $argument[0]) &&
                 $argument[0]['objectID'] === 'App\User::1';
         }));
 
         $user = factory(User::class)->create();
 
-        $usersIndexMock->shouldReceive('deleteBy')->once()->with([
-            'tagFilters' => [
-                ['App\User::1'],
-            ],
+        $client->shouldReceive('deleteBy')->once()->with('users', [
+            'tagFilters' => [['App\User::1']],
         ]);
 
         $user->delete();
@@ -81,50 +72,37 @@ class AggregatorTest extends TestCase
 
         Wall::bootSearchable();
 
-        $usersIndexMock = $this->mockIndex('users');
-        $wallIndexMock = $this->mockIndex('wall');
+        $this->mockIndex('users');
+        $this->mockIndex('wall');
+        $client = $this->mockClient();
 
-        $usersIndexMock->shouldReceive('saveObjects')->once()->with(Mockery::on(function ($argument) {
+        $client->shouldReceive('saveObjects')->once()->with('users', Mockery::on(function ($argument) {
             return count($argument) === 1 && array_key_exists('email', $argument[0]) &&
                 $argument[0]['objectID'] === 'App\User::1';
         }));
-        $wallIndexMock->shouldReceive('saveObjects')->once()->with(Mockery::on(function ($argument) {
+        $client->shouldReceive('saveObjects')->once()->with('wall', Mockery::on(function ($argument) {
             return count($argument) === 1 && array_key_exists('email', $argument[0]) &&
                 $argument[0]['objectID'] === 'App\User::1';
         }));
         $user = factory(User::class)->create();
 
-        $usersIndexMock->shouldReceive('browseObjects')->once()->with([
-            'attributesToRetrieve' => [
-                'objectID',
-            ],
-            'tagFilters' => [
-                ['App\User::1'],
-            ],
+        $client->shouldReceive('browseObjects')->once()->with('users', [
+            'attributesToRetrieve' => ['objectID'],
+            'tagFilters' => [['App\User::1']],
             // NOTE: This _should_ ideally return an instance of `\Algolia\AlgoliaSearch\Iterators\ObjectIterator`
             //       but mocking that class is not feasible as it has been declared `final`.
-        ])->andReturn([
-            ['objectID' => 'App\User::1'],
-        ]);
-        $usersIndexMock->shouldReceive('deleteObjects')->once()->with([
-            'App\User::1',
-        ]);
+        ])->andReturn([['objectID' => 'App\User::1']]);
 
-        $wallIndexMock->shouldReceive('browseObjects')->once()->with([
-            'attributesToRetrieve' => [
-                'objectID',
-            ],
-            'tagFilters' => [
-                ['App\User::1'],
-            ],
+        $client->shouldReceive('deleteObjects')->once()->with('users', ['App\User::1']);
+
+        $client->shouldReceive('browseObjects')->once()->with('wall', [
+            'attributesToRetrieve' => ['objectID'],
+            'tagFilters' => [['App\User::1']],
             // NOTE: This _should_ ideally return an instance of `\Algolia\AlgoliaSearch\Iterators\ObjectIterator`
             //       but mocking that class is not feasible as it has been declared `final`.
-        ])->andReturn([
-            ['objectID' => 'App\User::1'],
-        ]);
-        $wallIndexMock->shouldReceive('deleteObjects')->once()->with([
-            'App\User::1',
-        ]);
+        ])->andReturn([['objectID' => 'App\User::1']]);
+
+        $client->shouldReceive('deleteObjects')->once()->with('wall', ['App\User::1']);
 
         $user->delete();
     }
@@ -133,29 +111,26 @@ class AggregatorTest extends TestCase
     {
         Wall::bootSearchable();
 
-        $usersIndexMock = $this->mockIndex('users');
-        $wallIndexMock = $this->mockIndex('wall');
+        $this->mockIndex('users');
+        $this->mockIndex('wall');
+        $client = $this->mockClient();
 
-        $usersIndexMock->shouldReceive('saveObjects')->once()->with(Mockery::on(function ($argument) {
+        $client->shouldReceive('saveObjects')->once()->with('users', Mockery::on(function ($argument) {
             return count($argument) === 1 && array_key_exists('email', $argument[0]) &&
                 $argument[0]['objectID'] === 'App\User::1';
         }));
-        $wallIndexMock->shouldReceive('saveObjects')->once()->with(Mockery::on(function ($argument) {
+        $client->shouldReceive('saveObjects')->once()->with('wall', Mockery::on(function ($argument) {
             return count($argument) === 1 && array_key_exists('email', $argument[0]) &&
                 $argument[0]['objectID'] === 'App\User::1';
         }));
         $user = factory(User::class)->create();
 
-        $usersIndexMock->shouldReceive('deleteBy')->once()->with([
-            'tagFilters' => [
-                ['App\User::1'],
-            ],
+        $client->shouldReceive('deleteBy')->once()->with('users', [
+            'tagFilters' => [['App\User::1']],
         ]);
 
-        $wallIndexMock->shouldReceive('deleteBy')->once()->with([
-            'tagFilters' => [
-                ['App\User::1'],
-            ],
+        $client->shouldReceive('deleteBy')->once()->with('wall', [
+            'tagFilters' => [['App\User::1']],
         ]);
 
         $user->delete();
@@ -167,47 +142,34 @@ class AggregatorTest extends TestCase
 
         Wall::bootSearchable();
 
-        $threadIndexMock = $this->mockIndex(Thread::class);
-        $wallIndexMock = $this->mockIndex('wall');
+        $this->mockIndex(Thread::class);
+        $this->mockIndex('wall');
+        $client = $this->mockClient();
 
-        $threadIndexMock->shouldReceive('saveObjects')->once();
-        $wallIndexMock->shouldReceive('saveObjects')->once()->with(Mockery::on(function ($argument) {
+        $client->shouldReceive('saveObjects')->once()->with('threads', Mockery::any());
+        $client->shouldReceive('saveObjects')->once()->with('wall', Mockery::on(function ($argument) {
             return count($argument) === 1 && array_key_exists('body', $argument[0]) &&
                 $argument[0]['objectID'] === 'App\Thread::1';
         }));
         $thread = factory(Thread::class)->create();
 
-        $threadIndexMock->shouldReceive('browseObjects')->once()->with([
-            'attributesToRetrieve' => [
-                'objectID',
-            ],
-            'tagFilters' => [
-                ['App\Thread::1'],
-            ],
+        $client->shouldReceive('browseObjects')->once()->with('threads', [
+            'attributesToRetrieve' => ['objectID'],
+            'tagFilters' => [['App\Thread::1']],
             // NOTE: This _should_ ideally return an instance of `\Algolia\AlgoliaSearch\Iterators\ObjectIterator`
             //       but mocking that class is not feasible as it has been declared `final`.
-        ])->andReturn([
-            ['objectID' => 'App\Thread::1'],
-        ]);
-        $threadIndexMock->shouldReceive('deleteObjects')->once()->with([
-            'App\Thread::1',
-        ]);
+        ])->andReturn([['objectID' => 'App\Thread::1']]);
 
-        $wallIndexMock->shouldReceive('browseObjects')->once()->with([
-            'attributesToRetrieve' => [
-                'objectID',
-            ],
-            'tagFilters' => [
-                ['App\Thread::1'],
-            ],
+        $client->shouldReceive('deleteObjects')->once()->with('threads', ['App\Thread::1']);
+
+        $client->shouldReceive('browseObjects')->once()->with('wall', [
+            'attributesToRetrieve' => ['objectID'],
+            'tagFilters' => [['App\Thread::1']],
             // NOTE: This _should_ ideally return an instance of `\Algolia\AlgoliaSearch\Iterators\ObjectIterator`
             //       but mocking that class is not feasible as it has been declared `final`.
-        ])->andReturn([
-            ['objectID' => 'App\Thread::1'],
-        ]);
-        $wallIndexMock->shouldReceive('deleteObjects')->once()->with([
-            'App\Thread::1',
-        ]);
+        ])->andReturn([['objectID' => 'App\Thread::1']]);
+
+        $client->shouldReceive('deleteObjects')->once()->with('wall', ['App\Thread::1']);
 
         $thread->delete();
     }
@@ -216,27 +178,25 @@ class AggregatorTest extends TestCase
     {
         Wall::bootSearchable();
 
-        $threadIndexMock = $this->mockIndex(Thread::class);
-        $wallIndexMock = $this->mockIndex('wall');
+        $this->mockIndex(Thread::class);
+        $this->mockIndex('wall');
+        $client = $this->mockClient();
 
-        $threadIndexMock->shouldReceive('saveObjects')->once();
-        $wallIndexMock->shouldReceive('saveObjects')->once()->with(Mockery::on(function ($argument) {
+        $client->shouldReceive('saveObjects')->once()->with('threads', Mockery::any());
+        $client->shouldReceive('saveObjects')->once()->with('wall', Mockery::on(function ($argument) {
             return count($argument) === 1 && array_key_exists('body', $argument[0]) &&
                 $argument[0]['objectID'] === 'App\Thread::1';
         }));
         $thread = factory(Thread::class)->create();
 
-        $threadIndexMock->shouldReceive('deleteBy')->once()->with([
-            'tagFilters' => [
-                ['App\Thread::1'],
-            ],
+        $client->shouldReceive('deleteBy')->once()->with('threads', [
+            'tagFilters' => [['App\Thread::1']],
         ]);
 
-        $wallIndexMock->shouldReceive('deleteBy')->once()->with([
-            'tagFilters' => [
-                ['App\Thread::1'],
-            ],
+        $client->shouldReceive('deleteBy')->once()->with('wall', [
+            'tagFilters' => [['App\Thread::1']],
         ]);
+
         $thread->delete();
     }
 
@@ -246,28 +206,21 @@ class AggregatorTest extends TestCase
 
         Wall::bootSearchable();
 
-        $wallIndexMock = $this->mockIndex('wall');
+        $client = $this->mockIndex('wall');
 
         // Laravel Scout restore calls twice the save objects.
-        $wallIndexMock->shouldReceive('saveObjects')->times(3)->with(Mockery::on(function ($argument) {
+        $client->shouldReceive('saveObjects')->times(3)->with('wall', Mockery::on(function ($argument) {
             return count($argument) === 1 && array_key_exists('subject', $argument[0]) &&
                 $argument[0]['objectID'] === 'App\Post::1';
         }));
-        $wallIndexMock->shouldReceive('browseObjects')->times(3)->with([
-            'attributesToRetrieve' => [
-                'objectID',
-            ],
-            'tagFilters' => [
-                ['App\Post::1'],
-            ],
+        $client->shouldReceive('browseObjects')->times(3)->with('wall', [
+            'attributesToRetrieve' => ['objectID'],
+            'tagFilters' => [['App\Post::1']],
             // NOTE: This _should_ ideally return an instance of `\Algolia\AlgoliaSearch\Iterators\ObjectIterator`
             //       but mocking that class is not feasible as it has been declared `final`.
-        ])->andReturn([
-            ['objectID' => 'App\Post::1'],
-        ]);
-        $wallIndexMock->shouldReceive('deleteObjects')->times(3)->with([
-            'App\Post::1',
-        ]);
+        ])->andReturn([['objectID' => 'App\Post::1']]);
+        $client->shouldReceive('deleteObjects')->times(3)->with('wall', ['App\Post::1']);
+
         $post = factory(Post::class)->create();
         $post->delete();
         $post->restore();
@@ -278,18 +231,17 @@ class AggregatorTest extends TestCase
     {
         Wall::bootSearchable();
 
-        $wallIndexMock = $this->mockIndex('wall');
+        $client = $this->mockIndex('wall');
 
         // Laravel Scout restore calls twice the save objects.
-        $wallIndexMock->shouldReceive('saveObjects')->times(3)->with(Mockery::on(function ($argument) {
+        $client->shouldReceive('saveObjects')->times(3)->with('wall', Mockery::on(function ($argument) {
             return count($argument) === 1 && array_key_exists('subject', $argument[0]) &&
                 $argument[0]['objectID'] === 'App\Post::1';
         }));
-        $wallIndexMock->shouldReceive('deleteBy')->times(3)->with([
-            'tagFilters' => [
-                ['App\Post::1'],
-            ],
+        $client->shouldReceive('deleteBy')->times(3)->with('wall', [
+            'tagFilters' => [['App\Post::1']],
         ]);
+
         $post = factory(Post::class)->create();
         $post->delete();
         $post->restore();
@@ -304,31 +256,23 @@ class AggregatorTest extends TestCase
 
         $this->app['config']->set('scout.soft_delete', true);
 
-        $wallIndexMock = $this->mockIndex('wall');
+        $client = $this->mockIndex('wall');
 
         // Laravel Scout force Delete calls once the save() method.
-        $wallIndexMock->shouldReceive('saveObjects')->times(3)->with(Mockery::on(function ($argument) {
+        $client->shouldReceive('saveObjects')->times(3)->with('wall', Mockery::on(function ($argument) {
             return count($argument) === 1 && array_key_exists('subject', $argument[0]) &&
                 $argument[0]['objectID'] === 'App\Post::1';
         }));
         $post = factory(Post::class)->create();
         $post->delete();
 
-        $wallIndexMock->shouldReceive('browseObjects')->once()->with([
-            'attributesToRetrieve' => [
-                'objectID',
-            ],
-            'tagFilters' => [
-                ['App\Post::1'],
-            ],
+        $client->shouldReceive('browseObjects')->once()->with('wall', [
+            'attributesToRetrieve' => ['objectID'],
+            'tagFilters' => [['App\Post::1']],
             // NOTE: This _should_ ideally return an instance of `\Algolia\AlgoliaSearch\Iterators\ObjectIterator`
             //       but mocking that class is not feasible as it has been declared `final`.
-        ])->andReturn([
-            ['objectID' => 'App\Post::1'],
-        ]);
-        $wallIndexMock->shouldReceive('deleteObjects')->once()->with([
-            'App\Post::1',
-        ]);
+        ])->andReturn([['objectID' => 'App\Post::1']]);
+        $client->shouldReceive('deleteObjects')->once()->with('wall', ['App\Post::1']);
 
         $post->forceDelete();
     }
@@ -339,20 +283,18 @@ class AggregatorTest extends TestCase
 
         $this->app['config']->set('scout.soft_delete', true);
 
-        $wallIndexMock = $this->mockIndex('wall');
+        $client = $this->mockIndex('wall');
 
         // Laravel Scout force Delete calls once the save() method.
-        $wallIndexMock->shouldReceive('saveObjects')->times(3)->with(Mockery::on(function ($argument) {
+        $client->shouldReceive('saveObjects')->times(3)->with('wall', Mockery::on(function ($argument) {
             return count($argument) === 1 && array_key_exists('subject', $argument[0]) &&
                 $argument[0]['objectID'] === 'App\Post::1';
         }));
         $post = factory(Post::class)->create();
         $post->delete();
 
-        $wallIndexMock->shouldReceive('deleteBy')->once()->with([
-            'tagFilters' => [
-                ['App\Post::1'],
-            ],
+        $client->shouldReceive('deleteBy')->once()->with('wall', [
+            'tagFilters' => [['App\Post::1']],
         ]);
         $post->forceDelete();
     }
@@ -361,12 +303,13 @@ class AggregatorTest extends TestCase
     {
         Wall::bootSearchable();
 
-        $threadIndexMock = $this->mockIndex(Thread::class);
-        $wallIndexMock = $this->mockIndex('wall');
+        $this->mockIndex(Thread::class);
+        $this->mockIndex('wall');
+        $client = $this->mockClient();
 
-        $threadIndexMock->shouldReceive('saveObjects')->times(2);
-        $wallIndexMock->shouldReceive('saveObjects')->times(4);
-        $wallIndexMock->shouldReceive('search')->once()->andReturn([
+        $client->shouldReceive('saveObjects')->with('threads', Mockery::any())->times(2);
+        $client->shouldReceive('saveObjects')->with('wall', Mockery::any())->times(4);
+        $client->shouldReceive('searchSingleIndex')->with('wall', Mockery::any())->once()->andReturn([
             'hits' => [
                 ['objectID' => 'App\Post::1'],
                 ['objectID' => 'App\Thread::1'],
@@ -379,7 +322,7 @@ class AggregatorTest extends TestCase
         $thread = factory(Thread::class, 2)->create();
 
         $models = Wall::search('input')->get();
-        /* @var $models \Illuminate\Database\Eloquent\Collection */
+
         $this->assertCount(4, $models);
 
         $this->assertInstanceOf(Post::class, $models->get(0));
@@ -418,19 +361,18 @@ class AggregatorTest extends TestCase
         Wall::bootSearchable();
         News::bootSearchable();
 
-        $usersIndexMock = $this->mockIndex('users');
-        $wallIndexMock = $this->mockIndex('wall');
-        $newsIndexMock = $this->mockIndex('news');
+        $this->mockIndex('users');
+        $this->mockIndex('wall');
+        $this->mockIndex('news');
+        $client = $this->mockClient();
 
-        $usersIndexMock->shouldReceive('saveObjects');
-        $wallIndexMock->shouldReceive('saveObjects');
-        $newsIndexMock->shouldReceive('saveObjects');
+        $client->shouldReceive('saveObjects');
 
         $user = factory(User::class)->create();
 
         $response = ['hits' => [['objectID' => 'App\User::1']]];
-        $wallIndexMock->shouldReceive('search')->once()->andReturn($response);
-        $newsIndexMock->shouldReceive('search')->once()->andReturn($response);
+        $client->shouldReceive('searchSingleIndex')->with('wall', Mockery::any())->once()->andReturn($response);
+        $client->shouldReceive('searchSingleIndex')->with('news', Mockery::any())->once()->andReturn($response);
 
         $this->assertFalse(Wall::search()->get()->first()->relationLoaded('threads'));
         $this->assertTrue(News::search()->get()->first()->relationLoaded('threads'));
@@ -445,71 +387,48 @@ class AggregatorTest extends TestCase
             All::class,
         ]);
 
-        $usersIndexMock = $this->mockIndex('users');
-        $wallIndexMock = $this->mockIndex('wall');
-        $allIndexMock = $this->mockIndex('all');
+        $this->mockIndex('users');
+        $this->mockIndex('wall');
+        $this->mockIndex('all');
+        $client = $this->mockClient();
 
-        $usersIndexMock->shouldReceive('saveObjects')->once()->with(Mockery::on(function ($argument) {
+        $client->shouldReceive('saveObjects')->once()->with('users', Mockery::on(function ($argument) {
             return count($argument) === 1 && array_key_exists('email', $argument[0]) &&
                 $argument[0]['objectID'] === 'App\User::1';
         }));
-        $wallIndexMock->shouldReceive('saveObjects')->once()->with(Mockery::on(function ($argument) {
+        $client->shouldReceive('saveObjects')->once()->with('wall', Mockery::on(function ($argument) {
             return count($argument) === 1 && array_key_exists('email', $argument[0]) &&
                 $argument[0]['objectID'] === 'App\User::1';
         }));
-        $allIndexMock->shouldReceive('saveObjects')->once()->with(Mockery::on(function ($argument) {
+        $client->shouldReceive('saveObjects')->once()->with('all', Mockery::on(function ($argument) {
             return count($argument) === 1 && array_key_exists('email', $argument[0]) &&
                 $argument[0]['objectID'] === 'App\User::1';
         }));
         $user = factory(User::class)->create();
 
-        $usersIndexMock->shouldReceive('browseObjects')->once()->with([
-            'attributesToRetrieve' => [
-                'objectID',
-            ],
-            'tagFilters' => [
-                ['App\User::1'],
-            ],
+        $client->shouldReceive('browseObjects')->once()->with('users', [
+            'attributesToRetrieve' => ['objectID'],
+            'tagFilters' => [['App\User::1']],
             // NOTE: This _should_ ideally return an instance of `\Algolia\AlgoliaSearch\Iterators\ObjectIterator`
             //       but mocking that class is not feasible as it has been declared `final`.
-        ])->andReturn([
-            ['objectID' => 'App\User::1'],
-        ]);
-        $usersIndexMock->shouldReceive('deleteObjects')->once()->with([
-            'App\User::1',
-        ]);
+        ])->andReturn([['objectID' => 'App\User::1']]);
+        $client->shouldReceive('deleteObjects')->once()->with('users', ['App\User::1']);
 
-        $wallIndexMock->shouldReceive('browseObjects')->once()->with([
-            'attributesToRetrieve' => [
-                'objectID',
-            ],
-            'tagFilters' => [
-                ['App\User::1'],
-            ],
+        $client->shouldReceive('browseObjects')->once()->with('wall', [
+            'attributesToRetrieve' => ['objectID'],
+            'tagFilters' => [['App\User::1']],
             // NOTE: This _should_ ideally return an instance of `\Algolia\AlgoliaSearch\Iterators\ObjectIterator`
             //       but mocking that class is not feasible as it has been declared `final`.
-        ])->andReturn([
-            ['objectID' => 'App\User::1'],
-        ]);
-        $wallIndexMock->shouldReceive('deleteObjects')->once()->with([
-            'App\User::1',
-        ]);
+        ])->andReturn([['objectID' => 'App\User::1']]);
+        $client->shouldReceive('deleteObjects')->once()->with('wall', ['App\User::1']);
 
-        $allIndexMock->shouldReceive('browseObjects')->once()->with([
-            'attributesToRetrieve' => [
-                'objectID',
-            ],
-            'tagFilters' => [
-                ['App\User::1'],
-            ],
+        $client->shouldReceive('browseObjects')->once()->with('all', [
+            'attributesToRetrieve' => ['objectID'],
+            'tagFilters' => [['App\User::1']],
             // NOTE: This _should_ ideally return an instance of `\Algolia\AlgoliaSearch\Iterators\ObjectIterator`
             //       but mocking that class is not feasible as it has been declared `final`.
-        ])->andReturn([
-            ['objectID' => 'App\User::1'],
-        ]);
-        $allIndexMock->shouldReceive('deleteObjects')->once()->with([
-            'App\User::1',
-        ]);
+        ])->andReturn([['objectID' => 'App\User::1']]);
+        $client->shouldReceive('deleteObjects')->once()->with('all', ['App\User::1']);
 
         $user->delete();
     }
@@ -521,41 +440,28 @@ class AggregatorTest extends TestCase
             All::class,
         ]);
 
-        $usersIndexMock = $this->mockIndex('users');
-        $wallIndexMock = $this->mockIndex('wall');
-        $allIndexMock = $this->mockIndex('all');
+        $this->mockIndex('users');
+        $this->mockIndex('wall');
+        $this->mockIndex('all');
+        $client = $this->mockClient();
 
-        $usersIndexMock->shouldReceive('saveObjects')->once()->with(Mockery::on(function ($argument) {
+        $client->shouldReceive('saveObjects')->once()->with('users', Mockery::on(function ($argument) {
             return count($argument) === 1 && array_key_exists('email', $argument[0]) &&
                 $argument[0]['objectID'] === 'App\User::1';
         }));
-        $wallIndexMock->shouldReceive('saveObjects')->once()->with(Mockery::on(function ($argument) {
+        $client->shouldReceive('saveObjects')->once()->with('wall', Mockery::on(function ($argument) {
             return count($argument) === 1 && array_key_exists('email', $argument[0]) &&
                 $argument[0]['objectID'] === 'App\User::1';
         }));
-        $allIndexMock->shouldReceive('saveObjects')->once()->with(Mockery::on(function ($argument) {
+        $client->shouldReceive('saveObjects')->once()->with('all', Mockery::on(function ($argument) {
             return count($argument) === 1 && array_key_exists('email', $argument[0]) &&
                 $argument[0]['objectID'] === 'App\User::1';
         }));
         $user = factory(User::class)->create();
 
-        $usersIndexMock->shouldReceive('deleteBy')->once()->with([
-            'tagFilters' => [
-                ['App\User::1'],
-            ],
-        ]);
-
-        $wallIndexMock->shouldReceive('deleteBy')->once()->with([
-            'tagFilters' => [
-                ['App\User::1'],
-            ],
-        ]);
-
-        $allIndexMock->shouldReceive('deleteBy')->once()->with([
-            'tagFilters' => [
-                ['App\User::1'],
-            ],
-        ]);
+        $client->shouldReceive('deleteBy')->once()->with('users', ['tagFilters' => [['App\User::1']]]);
+        $client->shouldReceive('deleteBy')->once()->with('wall', ['tagFilters' => [['App\User::1']]]);
+        $client->shouldReceive('deleteBy')->once()->with('all', ['tagFilters' => [['App\User::1']]]);
 
         $user->delete();
     }
@@ -588,10 +494,11 @@ class AggregatorTest extends TestCase
     {
         $this->app['config']->set('scout.algolia.use_deprecated_delete_by', false);
 
-        $wallIndexMock = $this->mockIndex('wall');
-        $usersIndexMock = $this->mockIndex('users');
+        $this->mockIndex('wall');
+        $this->mockIndex('users');
+        $client = $this->mockClient();
 
-        $usersIndexMock->shouldReceive('saveObjects')->once();
+        $client->shouldReceive('saveObjects')->with('users', Mockery::any())->once();
         $user = factory(User::class)->create();
 
         ModelObserver::disableSyncingFor(User::class);
@@ -599,19 +506,14 @@ class AggregatorTest extends TestCase
         Wall::bootSearchable();
 
         try {
-            // Expect browseObjects and deleteObjects to be called on the wall index
-            $wallIndexMock->shouldReceive('browseObjects')->once()->with([
+            $client->shouldReceive('browseObjects')->once()->with('wall', [
                 'attributesToRetrieve' => ['objectID'],
                 'tagFilters' => [['App\User::1']],
             ])->andReturn([['objectID' => 'App\User::1']]);
-            $wallIndexMock->shouldReceive('deleteObjects')->once()->with(['App\User::1']);
+            $client->shouldReceive('deleteObjects')->once()->with('wall', ['App\User::1']);
 
-            // Ensure browseObjects and deleteObjects are NOT called on the users index
-            $usersIndexMock->shouldNotReceive('browseObjects')->with([
-                'attributesToRetrieve' => ['objectID'],
-                'tagFilters' => [['App\User::1']],
-            ])->andReturn([['objectID' => 'App\User::1']]);
-            $usersIndexMock->shouldNotReceive('deleteObjects')->with(['App\User::1']);
+            $client->shouldNotReceive('browseObjects')->with('users', Mockery::any());
+            $client->shouldNotReceive('deleteObjects')->with('users', Mockery::any());
 
             $user->delete();
         } finally {
@@ -623,10 +525,11 @@ class AggregatorTest extends TestCase
     {
         $this->app['config']->set('scout.algolia.use_deprecated_delete_by', false);
 
-        $wallIndexMock = $this->mockIndex('wall');
-        $usersIndexMock = $this->mockIndex('users');
+        $this->mockIndex('wall');
+        $this->mockIndex('users');
+        $client = $this->mockClient();
 
-        $usersIndexMock->shouldReceive('saveObjects')->once();
+        $client->shouldReceive('saveObjects')->with('users', Mockery::any())->once();
         $user = factory(User::class)->create();
 
         ModelObserver::disableSyncingFor(User::class);
@@ -634,19 +537,14 @@ class AggregatorTest extends TestCase
         Wall::bootSearchable();
 
         try {
-            // Expect browseObjects and deleteObjects to be called on the wall index
-            $wallIndexMock->shouldReceive('browseObjects')->once()->with([
-                'attributesToRetrieve' => ['objectID',],
-                'tagFilters' => [['App\User::1'],],
-            ])->andReturn([['objectID' => 'App\User::1']]);
-            $wallIndexMock->shouldReceive('deleteObjects')->once()->with(['App\User::1']);
-
-            // Ensure browseObjects and deleteObjects are NOT called on the users index
-            $usersIndexMock->shouldNotReceive('browseObjects')->with([
+            $client->shouldReceive('browseObjects')->once()->with('wall', [
                 'attributesToRetrieve' => ['objectID'],
                 'tagFilters' => [['App\User::1']],
             ])->andReturn([['objectID' => 'App\User::1']]);
-            $usersIndexMock->shouldNotReceive('deleteObjects')->with(['App\User::1']);
+            $client->shouldReceive('deleteObjects')->once()->with('wall', ['App\User::1']);
+
+            $client->shouldNotReceive('browseObjects')->with('users', Mockery::any());
+            $client->shouldNotReceive('deleteObjects')->with('users', Mockery::any());
 
             $user->forceDelete();
         } finally {
@@ -656,29 +554,25 @@ class AggregatorTest extends TestCase
 
     public function testSkipSavedWhenDisableSyncingFor(): void
     {
-        $wallIndexMock = $this->mockIndex('wall');
-        $usersIndexMock = $this->mockIndex('users');
+        $this->mockIndex('wall');
+        $this->mockIndex('users');
+        $client = $this->mockClient();
 
-        $usersIndexMock->shouldReceive('saveObjects')->once();
+        $client->shouldReceive('saveObjects')->with('users', Mockery::any())->once();
         $user = factory(User::class)->create();
 
         ModelObserver::disableSyncingFor(User::class);
 
         try {
-            // Expect saveObjects to be called once for the wall index
-            $wallIndexMock->shouldReceive('saveObjects')
-                ->once()
-                ->with(Mockery::on(function ($argument) {
-                    return count($argument) === 1 && array_key_exists('email', $argument[0]) &&
-                        $argument[0]['objectID'] === 'App\User::1';
-                }));
+            $client->shouldReceive('saveObjects')->once()->with('wall', Mockery::on(function ($argument) {
+                return count($argument) === 1 && array_key_exists('email', $argument[0]) &&
+                    $argument[0]['objectID'] === 'App\User::1';
+            }));
 
-            // Ensure saveObjects is NOT called for the users index
-            $usersIndexMock->shouldNotReceive('saveObjects')
-                ->with(Mockery::on(function ($argument) {
-                    return count($argument) === 1 && array_key_exists('email', $argument[0]) &&
-                        $argument[0]['objectID'] === 'App\User::1';
-                }));
+            $client->shouldNotReceive('saveObjects')->with('users', Mockery::on(function ($argument) {
+                return count($argument) === 1 && array_key_exists('email', $argument[0]) &&
+                    $argument[0]['objectID'] === 'App\User::1';
+            }));
 
             Wall::bootSearchable();
 

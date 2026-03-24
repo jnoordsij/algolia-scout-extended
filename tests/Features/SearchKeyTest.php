@@ -15,12 +15,10 @@ class SearchKeyTest extends TestCase
     {
         $this->mockClient()->shouldReceive('listApiKeys')->andReturn(['keys' => []]);
 
-        $response = $this->mockResponse();
-        $response->shouldReceive('getBody')->andReturn(['key' => 'bar']);
-
-        $this->mockClient()->shouldReceive('addApiKey')->with(['search'], [
+        $this->mockClient()->shouldReceive('addApiKey')->with([
+            'acl' => ['search'],
             'description' => config('app.name').'::searchKey',
-        ])->andReturn($response);
+        ])->andReturn(['key' => 'bar']);
 
         $this->mockClient()->shouldReceive('generateSecuredApiKey')->with('bar', [
             'restrictIndices' => 'users',
@@ -34,12 +32,10 @@ class SearchKeyTest extends TestCase
     {
         $this->mockClient()->shouldReceive('listApiKeys')->andReturn(['keys' => [['foo' => 'bar']]]);
 
-        $response = $this->mockResponse();
-        $response->shouldReceive('getBody')->andReturn(['key' => 'bar']);
-
-        $this->mockClient()->shouldReceive('addApiKey')->with(['search'], [
+        $this->mockClient()->shouldReceive('addApiKey')->with([
+            'acl' => ['search'],
             'description' => config('app.name').'::searchKey',
-        ])->andReturn($response);
+        ])->andReturn(['key' => 'bar']);
 
         $this->mockClient()->shouldReceive('generateSecuredApiKey')->with('bar', [
             'restrictIndices' => 'users',
