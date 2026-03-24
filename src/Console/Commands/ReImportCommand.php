@@ -16,6 +16,8 @@ namespace Algolia\ScoutExtended\Console\Commands;
 use Algolia\AlgoliaSearch\Api\SearchClient;
 use Algolia\AlgoliaSearch\Exceptions\NotFoundException;
 use Algolia\AlgoliaSearch\Model\Search\OperationIndexParams;
+use Algolia\AlgoliaSearch\Model\Search\OperationType;
+use Algolia\AlgoliaSearch\Model\Search\ScopeType;
 use Algolia\ScoutExtended\Helpers\SearchableFinder;
 use function count;
 use Illuminate\Console\Command;
@@ -65,10 +67,11 @@ class ReImportCommand extends Command
 
                 $response = $client->operationIndex(
                     $indexName,
-                    (new OperationIndexParams())
-                        ->setOperation('copy')
-                        ->setDestination($temporaryName)
-                        ->setScope(['settings', 'synonyms', 'rules'])
+                    new OperationIndexParams([
+                        'operation' => OperationType::COPY,
+                        'destination' => $temporaryName,
+                        'scope' => [ScopeType::SETTINGS, ScopeType::SYNONYMS, ScopeType::RULES],
+                    ])
                 );
                 $client->waitForTask($temporaryName, $response['taskID']);
             } catch (NotFoundException $e) {
@@ -98,9 +101,10 @@ class ReImportCommand extends Command
 
                 $response = $client->operationIndex(
                     $temporaryName,
-                    (new OperationIndexParams())
-                        ->setOperation('move')
-                        ->setDestination($indexName)
+                    new OperationIndexParams([
+                        'operation' => OperationType::MOVE,
+                        'destination' => $indexName,
+                    ])
                 );
 
                 if ($config->get('scout.synchronous', false)) {

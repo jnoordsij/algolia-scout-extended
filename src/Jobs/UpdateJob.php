@@ -85,7 +85,7 @@ class UpdateJob
     }
 
     /**
-     * @param \Algolia\AlgoliaSearch\SearchClient $client
+     * @param \Algolia\AlgoliaSearch\Api\SearchClient $client
      *
      * @return void
      */
