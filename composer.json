@@ -24,7 +24,7 @@
     "require": {
         "php": "^8.0",
         "ext-json": "*",
-        "algolia/algoliasearch-client-php": "^3.0.0",
+        "algolia/algoliasearch-client-php": "^4.39.1",
         "illuminate/console": "^9.0|^10.0|^11.0|^12.0",
         "illuminate/contracts": "^9.0|^10.0|^11.0|^12.0",
         "illuminate/database": "^9.0|^10.0|^11.0|^12.0",
@@ -50,10 +50,7 @@
             "Tests\\": "tests/",
             "App\\": "tests/laravel/app",
             "Modules\\": "tests/laravel/modules"
-        },
-        "files": [
-            "vendor/mockery/mockery/library/helpers.php"
-        ]
+        }
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

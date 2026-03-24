@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Algolia\ScoutExtended\Engines;
 
-use Algolia\AlgoliaSearch\SearchClient;
+use Algolia\AlgoliaSearch\Api\SearchClient;
 use Algolia\ScoutExtended\Jobs\DeleteJob;
 use Algolia\ScoutExtended\Jobs\UpdateJob;
 use Algolia\ScoutExtended\Searchable\ModelsResolver;
@@ -114,9 +114,7 @@ class AlgoliaEngine extends BaseAlgoliaEngine
      */
     public function flush($model)
     {
-        $index = $this->algolia->initIndex($model->searchableAs());
-
-        $index->clearObjects();
+        $this->algolia->clearObjects($model->searchableAs());
     }
 
     /**

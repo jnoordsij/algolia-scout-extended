@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Algolia\ScoutExtended\Repositories;
 
-use Algolia\AlgoliaSearch\SearchIndex;
-
 /**
  * @internal
  */
@@ -38,13 +36,13 @@ class UserDataRepository
     /**
      * Find the User Data of the given Index.
      *
-     * @param  \Algolia\AlgoliaSearch\SearchIndex $index
+     * @param  string $indexName
      *
      * @return array
      */
-    public function find(SearchIndex $index): array
+    public function find(string $indexName): array
     {
-        $settings = $this->remoteRepository->getSettingsRaw($index);
+        $settings = $this->remoteRepository->getSettingsRaw($indexName);
 
         if (array_key_exists('userData', $settings)) {
             $userData = @json_decode($settings['userData'], true);
@@ -56,30 +54,30 @@ class UserDataRepository
     /**
      * Save the User Data of the given Index.
      *
-     * @param  \Algolia\AlgoliaSearch\SearchIndex $index
+     * @param  string $indexName
      * @param  array $userData
      *
      * @return void
      */
-    public function save(SearchIndex $index, array $userData): void
+    public function save(string $indexName, array $userData): void
     {
-        $currentUserData = $this->find($index);
+        $currentUserData = $this->find($indexName);
 
         $userDataJson = json_encode(array_merge($currentUserData, $userData));
 
-        $index->setSettings(['userData' => $userDataJson])->wait();
+        $this->remoteRepository->setSettings($indexName, ['userData' => $userDataJson]);
     }
 
     /**
      * Get the settings hash.
      *
-     * @param  \Algolia\AlgoliaSearch\SearchIndex $index
+     * @param  string $indexName
      *
      * @return string
      */
-    public function getSettingsHash(SearchIndex $index): string
+    public function getSettingsHash(string $indexName): string
     {
-        $userData = $this->find($index);
+        $userData = $this->find($indexName);
 
         return $userData['settingsHash'] ?? '';
     }

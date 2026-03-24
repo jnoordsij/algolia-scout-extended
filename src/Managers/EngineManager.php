@@ -13,8 +13,7 @@ declare(strict_types=1);
 
 namespace Algolia\ScoutExtended\Managers;
 
-use Algolia\AlgoliaSearch\SearchClient;
-use Algolia\AlgoliaSearch\Support\UserAgent;
+use Algolia\AlgoliaSearch\Api\SearchClient;
 use Algolia\ScoutExtended\Engines\AlgoliaEngine;
 use Laravel\Scout\EngineManager as BaseEngineManager;
 
@@ -27,8 +26,6 @@ class EngineManager extends BaseEngineManager
      */
     public function createAlgoliaDriver(): AlgoliaEngine
     {
-        UserAgent::addCustomUserAgent('Laravel Scout Extended', '3.2.2');
-
         return new AlgoliaEngine(SearchClient::create(config('scout.algolia.id'), config('scout.algolia.secret')));
     }
 }

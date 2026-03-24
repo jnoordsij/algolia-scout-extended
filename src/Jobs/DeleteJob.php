@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Algolia\ScoutExtended\Jobs;
 
-use Algolia\AlgoliaSearch\SearchClient;
+use Algolia\AlgoliaSearch\Api\SearchClient;
 use Algolia\ScoutExtended\Searchable\ObjectIdEncrypter;
 use Illuminate\Support\Collection;
 
@@ -40,7 +40,7 @@ class DeleteJob
     }
 
     /**
-     * @param \Algolia\AlgoliaSearch\SearchClient $client
+     * @param \Algolia\AlgoliaSearch\Api\SearchClient $client
      *
      * @return void
      */
@@ -67,15 +67,15 @@ class DeleteJob
     /**
      * Handle deleting objects.
      *
-     * @param \Algolia\AlgoliaSearch\SearchClient $client
+     * @param \Algolia\AlgoliaSearch\Api\SearchClient $client
      * @return void
      */
     protected function handleDeleteObjects(SearchClient $client)
     {
-        $index = $client->initIndex($this->searchables->first()->searchableAs());
+        $indexName = $this->searchables->first()->searchableAs();
 
         // First fetch all object IDs by tags.
-        $objects = $index->browseObjects([
+        $objects = $client->browseObjects($indexName, [
             'attributesToRetrieve' => [
                 'objectID',
             ],
@@ -95,24 +95,24 @@ class DeleteJob
         }
 
         // Then delete the objects using their object IDs.
-        $result = $index->deleteObjects($objectIds);
+        $response = $client->deleteObjects($indexName, $objectIds);
 
         if (config('scout.synchronous', false)) {
-            $result->wait();
+            $client->waitForTask($indexName, $response['taskID']);
         }
     }
 
     /**
      * Handle deleting objects using the deprecated `deleteBy` method.
      *
-     * @param \Algolia\AlgoliaSearch\SearchClient $client
+     * @param \Algolia\AlgoliaSearch\Api\SearchClient $client
      * @return void
      */
     protected function handleDeprecatedDeleteBy(SearchClient $client)
     {
-        $index = $client->initIndex($this->searchables->first()->searchableAs());
+        $indexName = $this->searchables->first()->searchableAs();
 
-        $result = $index->deleteBy([
+        $response = $client->deleteBy($indexName, [
             'tagFilters' => [
                 $this->searchables->map(function ($searchable) {
                     return ObjectIdEncrypter::encrypt($searchable);
@@ -121,7 +121,7 @@ class DeleteJob
         ]);
 
         if (config('scout.synchronous', false)) {
-            $result->wait();
+            $client->waitForTask($indexName, $response['taskID']);
         }
     }
 }
