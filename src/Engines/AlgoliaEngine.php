@@ -21,18 +21,10 @@ use Algolia\ScoutExtended\Searchable\ObjectIdEncrypter;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 use Laravel\Scout\Builder;
-use Laravel\Scout\Scout;
+use Laravel\Scout\Engines\Algolia4Engine;
 use function is_array;
 
-if (version_compare(Scout::VERSION, '10.11.6', '>=')) {
-    // Scout >= 10.11.6 ships Algolia4Engine for the v4 client
-    class_alias(\Laravel\Scout\Engines\Algolia4Engine::class, BaseAlgoliaEngine::class);
-} else {
-    // Legacy Laravel Scout class
-    class_alias(\Laravel\Scout\Engines\AlgoliaEngine::class, BaseAlgoliaEngine::class);
-}
-
-class AlgoliaEngine extends BaseAlgoliaEngine
+class AlgoliaEngine extends Algolia4Engine
 {
     /**
      * @param \Algolia\AlgoliaSearch\Api\SearchClient $algolia
