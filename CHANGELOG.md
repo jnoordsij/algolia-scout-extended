@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Changed
+- Upgraded `algolia/algoliasearch-client-php` from v3 to v4
+- Dropped PHP 8.0 support — PHP ^8.1 is now required
+- `use_deprecated_delete_by` now defaults to `false`; objects are removed via `browseObjects` + `deleteObjects` instead of `deleteBy`
+
+### Removed
+- All v3 `SearchIndex` object abstractions replaced by the v4 flat client API (index name passed as first argument to every method)
 
 ## [3.2.2](https://github.com/algolia/scout-extended/compare/v3.2.1...v3.2.2) - 2025-06-04
 ### Fixed
