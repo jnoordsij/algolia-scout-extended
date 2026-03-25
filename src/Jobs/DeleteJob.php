@@ -55,9 +55,7 @@ class DeleteJob
         // integrations will still function even if they dispatch jobs manually
         // or extend this class.
 
-        // NOTE: Currently defaulting `scout.algolia.use_deprecated_delete_by` to
-        //       `true` so that there's no change to the existing behaviour.
-        if (config('scout.algolia.use_deprecated_delete_by', true)) {
+        if (config('scout.algolia.use_deprecated_delete_by', false)) {
             $this->handleDeprecatedDeleteBy($client);
         } else {
             $this->handleDeleteObjects($client);

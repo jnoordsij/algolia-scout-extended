@@ -115,7 +115,7 @@ class RemoteSettingsRepository
         try {
             $rawSettings = $this->client->getSettings($indexName);
         } catch (NotFoundException $e) {
-            $response = $this->client->saveObject($indexName, ['objectID' => 'temp']);
+            $response = $this->client->saveObjects($indexName, [['objectID' => 'temp']]);
             $this->client->waitForTask($indexName, $response['taskID']);
             $rawSettings = $this->client->getSettings($indexName);
             $this->client->clearObjects($indexName);

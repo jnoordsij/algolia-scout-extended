@@ -43,6 +43,8 @@ class UnsearchableTest extends TestCase
 
     public function testUnsearchableWithDeprecatedDeleteBy(): void
     {
+        $this->app['config']->set('scout.algolia.use_deprecated_delete_by', true);
+
         factory(User::class, 5)->create();
 
         $this->mockIndex(User::class)

@@ -50,6 +50,8 @@ class AggregatorTest extends TestCase
 
     public function testWhenAggregagorIsNotBootedWithDeprecatedDeleteBy(): void
     {
+        $this->app['config']->set('scout.algolia.use_deprecated_delete_by', true);
+
         $client = $this->mockIndex('users');
 
         $client->shouldReceive('saveObjects')->once()->with('users', Mockery::on(function ($argument) {
@@ -109,6 +111,8 @@ class AggregatorTest extends TestCase
 
     public function testAggregatorWithSearchableModelWithDeprecatedDeleteBy(): void
     {
+        $this->app['config']->set('scout.algolia.use_deprecated_delete_by', true);
+
         Wall::bootSearchable();
 
         $this->mockIndex('users');
@@ -176,6 +180,8 @@ class AggregatorTest extends TestCase
 
     public function testAggregatorWithNonSearchableModelWithDeprecatedDeleteBy(): void
     {
+        $this->app['config']->set('scout.algolia.use_deprecated_delete_by', true);
+
         Wall::bootSearchable();
 
         $this->mockIndex(Thread::class);
@@ -229,6 +235,8 @@ class AggregatorTest extends TestCase
 
     public function testAggregatorSoftDeleteModelWithoutSoftDeletesOnIndexWithDeprecatedDeleteBy(): void
     {
+        $this->app['config']->set('scout.algolia.use_deprecated_delete_by', true);
+
         Wall::bootSearchable();
 
         $client = $this->mockIndex('wall');
@@ -279,6 +287,8 @@ class AggregatorTest extends TestCase
 
     public function testAggregatorSoftDeleteModelWithSoftDeletesOnIndexWithDeprecatedDeleteBy(): void
     {
+        $this->app['config']->set('scout.algolia.use_deprecated_delete_by', true);
+
         Wall::bootSearchable();
 
         $this->app['config']->set('scout.soft_delete', true);
@@ -435,6 +445,8 @@ class AggregatorTest extends TestCase
 
     public function testAggregatorWithMultipleBootsWithDeprecatedDeleteBy(): void
     {
+        $this->app['config']->set('scout.algolia.use_deprecated_delete_by', true);
+
         Aggregators::bootSearchables([
             Wall::class,
             All::class,
@@ -468,6 +480,8 @@ class AggregatorTest extends TestCase
 
     public function testWhenAggregatorIsBootedBeforePlainScoutSearchableTrait(): void
     {
+        $this->expectNotToPerformAssertions();
+
         config(['scout.queue' => true]);
 
         // Scout's base `queueRemoveFromSearch` method dispatches this job to remove models from

@@ -33,6 +33,8 @@ abstract class TestCase extends BaseTestCase
     {
         @unlink(__DIR__.'/laravel/config/scout-users.php');
 
+        $this->addToAssertionCount(Mockery::getContainer()->mockery_getExpectationCount());
+
         Mockery::close();
 
         parent::tearDown();

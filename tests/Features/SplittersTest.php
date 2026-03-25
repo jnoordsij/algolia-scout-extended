@@ -53,6 +53,8 @@ class SplittersTest extends TestCase
 
     public function testRecordsAreSplittedByASplitterWithDeprecatedDeleteBy(): void
     {
+        $this->app['config']->set('scout.algolia.use_deprecated_delete_by', true);
+
         $index = $this->mockIndex(ThreadWithSplitterClass::class);
 
         $index->shouldReceive('saveObjects')->once()->with('threads', Mockery::on(function ($argument) {
@@ -115,6 +117,8 @@ class SplittersTest extends TestCase
 
     public function testRecordsAreTextSplittedByValueWithDeprecatedDeleteBy(): void
     {
+        $this->app['config']->set('scout.algolia.use_deprecated_delete_by', true);
+
         $index = $this->mockIndex(ThreadWithValueReturned::class);
 
         $index->shouldReceive('saveObjects')->once()->with('threads', Mockery::on(function ($argument) {
@@ -177,6 +181,8 @@ class SplittersTest extends TestCase
 
     public function testRecordsAreTextSplittedSplitterInstanceWithDeprecatedDeleteBy(): void
     {
+        $this->app['config']->set('scout.algolia.use_deprecated_delete_by', true);
+
         $index = $this->mockIndex(ThreadWithSplitterInstance::class);
 
         $index->shouldReceive('saveObjects')->once()->with('threads', Mockery::on(function ($argument) {
@@ -259,6 +265,8 @@ class SplittersTest extends TestCase
 
     public function testRecordsCanHaveMultipleSplitsWithDeprecatedDeleteBy(): void
     {
+        $this->app['config']->set('scout.algolia.use_deprecated_delete_by', true);
+
         $index = $this->mockIndex(ThreadMultipleSplits::class);
 
         $index->shouldReceive('saveObjects')->once()->with('threads', Mockery::on(function ($argument) {
@@ -349,6 +357,8 @@ class SplittersTest extends TestCase
 
     public function testSearchMethodWithDeprecatedDeleteBy(): void
     {
+        $this->app['config']->set('scout.algolia.use_deprecated_delete_by', true);
+
         $index = $this->mockIndex(ThreadWithValueReturned::class);
 
         $index->shouldReceive('saveObjects')->twice();
