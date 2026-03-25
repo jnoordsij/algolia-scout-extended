@@ -135,9 +135,9 @@ class AlgoliaEngine extends BaseAlgoliaEngine
     }
 
     /**
-     * {@inheritdoc}
+     * @return array
      */
-    protected function filters(Builder $builder): array
+    protected function filters(Builder $builder)
     {
         $operators = ['<', '<=', '=', '!=', '>=', '>', ':'];
 
