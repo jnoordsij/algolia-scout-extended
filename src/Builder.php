@@ -110,7 +110,7 @@ class Builder extends BaseBuilder
      */
     public function whereIn($field, $values): self
     {
-        if(! empty($values)) {
+        if (! empty($values)) {
             $wheres = array_map(function ($value) use ($field) {
                 return "$field={$this->transform($value)}";
             }, array_values($values));

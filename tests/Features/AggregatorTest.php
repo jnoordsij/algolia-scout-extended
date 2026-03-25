@@ -613,5 +613,6 @@ class DummyRemoveFromSearch {
     }
     public function onConnection()
     {
+        return $this;
     }
 }

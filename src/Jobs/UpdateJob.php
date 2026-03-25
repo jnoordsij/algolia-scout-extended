@@ -19,17 +19,17 @@ use Algolia\ScoutExtended\Searchable\ModelsResolver;
 use Algolia\ScoutExtended\Searchable\ObjectIdEncrypter;
 use Algolia\ScoutExtended\Transformers\ConvertDatesToTimestamps;
 use Algolia\ScoutExtended\Transformers\ConvertNumericStringsToNumbers;
-use Laravel\Scout\Searchable;
-use function get_class;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Laravel\Scout\Searchable;
+use ReflectionClass;
+use function get_class;
 use function in_array;
 use function is_array;
 use function is_string;
-use ReflectionClass;
 
 /**
  * @internal
