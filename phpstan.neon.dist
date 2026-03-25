@@ -4,9 +4,13 @@ parameters:
     level: 5
     paths:
         - src
+    bootstrapFiles:
+        - phpstan-bootstrap.php
     treatPhpDocTypesAsCertain: false
     ignoreErrors:
         - '#Illuminate\\Database\\Eloquent\\Model::(searchableAs|searchableUsing)\(\)#'
         - '#Unsafe usage of new static#'
         - message: '#Return type \(array\) of method Algolia\\ScoutExtended\\Engines\\AlgoliaEngine::filters\(\) should be compatible with return type \(string\)#'
+          reportUnmatched: false
+        - message: '#Return type \(Algolia\\ScoutExtended\\Engines\\AlgoliaEngine\) of method Algolia\\ScoutExtended\\Managers\\EngineManager::createAlgoliaDriver\(\) should be compatible#'
           reportUnmatched: false
