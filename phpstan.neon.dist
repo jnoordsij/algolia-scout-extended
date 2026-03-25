@@ -5,8 +5,8 @@ parameters:
     paths:
         - src
     treatPhpDocTypesAsCertain: false
-    reportUnmatchedIgnoredErrors: false
     ignoreErrors:
         - '#Illuminate\\Database\\Eloquent\\Model::(searchableAs|searchableUsing)\(\)#'
         - '#Unsafe usage of new static#'
-        - '#Return type \(array\) of method Algolia\\ScoutExtended\\Engines\\AlgoliaEngine::filters\(\) should be compatible with return type \(string\)#'
+        - message: '#Return type \(array\) of method Algolia\\ScoutExtended\\Engines\\AlgoliaEngine::filters\(\) should be compatible with return type \(string\)#'
+          reportUnmatched: false
