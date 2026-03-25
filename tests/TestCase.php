@@ -168,11 +168,9 @@ abstract class TestCase extends BaseTestCase
 
         $algoliaEngine = new AlgoliaEngine($clientMock);
 
-        $engineMock = mock($algoliaEngine)->makePartial();
-
         $managerMock = mock(EngineManager::class)->makePartial();
 
-        $managerMock->shouldReceive('driver')->andReturn($engineMock);
+        $managerMock->shouldReceive('driver')->andReturn($algoliaEngine);
 
         $this->swap(EngineManager::class, $managerMock);
 
