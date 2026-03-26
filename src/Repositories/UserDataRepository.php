@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Algolia\ScoutExtended\Repositories;
 
+use Algolia\AlgoliaSearch\Api\SearchClient;
+
 /**
  * @internal
  */
@@ -24,13 +26,20 @@ class UserDataRepository
     private $remoteRepository;
 
     /**
+     * @var \Algolia\AlgoliaSearch\Api\SearchClient
+     */
+    private $client;
+
+    /**
      * UserDataRepository constructor.
      *
      * @param \Algolia\ScoutExtended\Repositories\RemoteSettingsRepository $remoteRepository
+     * @param \Algolia\AlgoliaSearch\Api\SearchClient $client
      */
-    public function __construct(RemoteSettingsRepository $remoteRepository)
+    public function __construct(RemoteSettingsRepository $remoteRepository, SearchClient $client)
     {
         $this->remoteRepository = $remoteRepository;
+        $this->client = $client;
     }
 
     /**
@@ -65,7 +74,8 @@ class UserDataRepository
 
         $userDataJson = json_encode(array_merge($currentUserData, $userData));
 
-        $this->remoteRepository->setSettings($indexName, ['userData' => $userDataJson]);
+        $response = $this->client->setSettings($indexName, ['userData' => $userDataJson]);
+        $this->client->waitForTask($indexName, $response['taskID']);
     }
 
     /**

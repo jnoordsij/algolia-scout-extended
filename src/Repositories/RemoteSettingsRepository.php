@@ -94,18 +94,6 @@ class RemoteSettingsRepository
     }
 
     /**
-     * @param string $indexName
-     * @param array $settings
-     *
-     * @return void
-     */
-    public function setSettings(string $indexName, array $settings): void
-    {
-        $response = $this->client->setSettings($indexName, $settings);
-        $this->client->waitForTask($indexName, $response['taskID']);
-    }
-
-    /**
      * @param  string $indexName
      *
      * @return array
