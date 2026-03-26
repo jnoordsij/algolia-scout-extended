@@ -12,14 +12,7 @@ aliases:
 
   - &install_dependencies
     name: Install Composer dependencies
-    command: |
-      case "<<parameters.laravel>>" in
-        10) TESTBENCH="^8.0" ;;
-        11) TESTBENCH="^9.0" ;;
-        12) TESTBENCH="^10.0" ;;
-        13) TESTBENCH="^11.0" ;;
-      esac
-      COMPOSER_MEMORY_LIMIT=-1 composer require "orchestra/testbench=${TESTBENCH}" --dev --prefer-dist --no-interaction
+    command: COMPOSER_MEMORY_LIMIT=-1 composer require "orchestra/testbench=^$((<<parameters.laravel>> - 2)).0" --dev --prefer-dist --no-interaction
 
   - &save_cache
     name: save Composer cache
