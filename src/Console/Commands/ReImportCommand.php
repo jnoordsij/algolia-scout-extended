@@ -18,6 +18,8 @@ use Algolia\AlgoliaSearch\Exceptions\NotFoundException;
 use Algolia\AlgoliaSearch\Model\Search\OperationIndexParams;
 use Algolia\AlgoliaSearch\Model\Search\OperationType;
 use Algolia\AlgoliaSearch\Model\Search\ScopeType;
+use Algolia\AlgoliaSearch\Model\Search\OperationType;
+use Algolia\AlgoliaSearch\Model\Search\ScopeType;
 use Algolia\ScoutExtended\Helpers\SearchableFinder;
 use function count;
 use Illuminate\Console\Command;
