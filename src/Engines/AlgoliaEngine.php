@@ -112,18 +112,16 @@ class AlgoliaEngine extends Algolia4Engine
     {
         $operators = ['<', '<=', '=', '!=', '>=', '>', ':'];
 
-        return collect($builder->wheres)->map(function ($where) use ($operators) {
-            if (isset($where['field'])) {
-                $field = $where['field'];
-                $value = $where['value'];
-                if (Str::endsWith($field, $operators) || Str::startsWith($value, $operators)) {
-                    return $field.' '.$value;
+        return collect($builder->wheres)->map(function ($value, $key) use ($operators) {
+            if (! is_array($value)) {
+                if (Str::endsWith($key, $operators) || Str::startsWith($value, $operators)) {
+                    return $key.' '.$value;
                 }
 
-                return $field.'='.$value;
+                return $key.'='.$value;
             }
 
-            return $where;
+            return $value;
         })->values()->all();
     }
 

@@ -79,10 +79,12 @@ class Builder extends BaseBuilder
         // passed to the method, we will assume that the operator is an equals sign
         // and keep going. Otherwise, we'll require the operator to be passed in.
         if (func_num_args() === 2) {
-            return parent::where($field, $this->transform($operator));
+            $this->wheres[$field] = $this->transform($operator);
+        } else {
+            $this->wheres[$field] = "$operator {$this->transform($value)}";
         }
 
-        return parent::where($field, "$operator {$this->transform($value)}");
+        return $this;
     }
 
     /**
