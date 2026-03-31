@@ -19,7 +19,6 @@ use Algolia\ScoutExtended\Jobs\UpdateJob;
 use Algolia\ScoutExtended\Searchable\ModelsResolver;
 use Algolia\ScoutExtended\Searchable\ObjectIdEncrypter;
 use Illuminate\Support\LazyCollection;
-use Illuminate\Support\Str;
 use Laravel\Scout\Builder;
 use Laravel\Scout\Engines\Algolia4Engine;
 use function is_array;
@@ -68,7 +67,7 @@ class AlgoliaEngine extends Algolia4Engine
     public function search(Builder $builder)
     {
         return $this->performSearch($builder, array_filter([
-            'numericFilters' => $this->filters($builder),
+            'filters' => $this->filters($builder),
             'hitsPerPage' => $builder->limit,
         ]));
     }
@@ -79,7 +78,7 @@ class AlgoliaEngine extends Algolia4Engine
     public function paginate(Builder $builder, $perPage, $page)
     {
         return $this->performSearch($builder, [
-            'numericFilters' => $this->filters($builder),
+            'filters' => $this->filters($builder),
             'hitsPerPage' => $perPage,
             'page' => $page - 1,
         ]);
@@ -106,23 +105,27 @@ class AlgoliaEngine extends Algolia4Engine
     }
 
     /**
-     * @return array
+     * @return string
      */
-    protected function filters(Builder $builder)
+    protected function filters(Builder $builder): string
     {
-        $operators = ['<', '<=', '=', '!=', '>=', '>', ':'];
+        $parts = [];
 
-        return collect($builder->wheres)->map(function ($value, $key) use ($operators) {
-            if (! is_array($value)) {
-                if (Str::endsWith($key, $operators) || Str::startsWith($value, $operators)) {
-                    return $key.' '.$value;
-                }
+        foreach ($builder->whereIns as $field => $values) {
+            $parts[] = empty($values)
+                ? '(0 = 1)'
+                : '('.implode(' OR ', array_map(fn ($v) => "$field=$v", $values)).')';
+        }
 
-                return $key.'='.$value;
-            }
+        foreach ($builder->wheres as ['field' => $field, 'operator' => $operator, 'value' => $value]) {
+            $parts[] = match ($operator) {
+                ':' => "$field: {$value[0]} TO {$value[1]}",
+                '=' => "$field=$value",
+                default => "$field $operator $value",
+            };
+        }
 
-            return $value;
-        })->values()->all();
+        return implode(' AND ', $parts);
     }
 
     /**

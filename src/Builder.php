@@ -75,14 +75,11 @@ class Builder extends BaseBuilder
      */
     public function where($field, $operator, $value = null): self
     {
-        // Here we will make some assumptions about the operator. If only 2 values are
-        // passed to the method, we will assume that the operator is an equals sign
-        // and keep going. Otherwise, we'll require the operator to be passed in.
         if (func_num_args() === 2) {
             return parent::where($field, $this->transform($operator));
         }
 
-        return parent::where($field, "$operator {$this->transform($value)}");
+        return parent::where($field, $operator, $this->transform($value));
     }
 
     /**
@@ -95,7 +92,7 @@ class Builder extends BaseBuilder
      */
     public function whereBetween($field, array $values): self
     {
-        return $this->where("$field:", "{$this->transform($values[0])} TO {$this->transform($values[1])}");
+        return parent::where($field, ':', [$this->transform($values[0]), $this->transform($values[1])]);
     }
 
     /**
@@ -108,17 +105,7 @@ class Builder extends BaseBuilder
      */
     public function whereIn($field, $values): self
     {
-        if (! empty($values)) {
-            $wheres = array_map(function ($value) use ($field) {
-                return "$field={$this->transform($value)}";
-            }, array_values($values));
-        } else {
-            $wheres = ['0 = 1'];
-        }
-
-        $this->wheres[] = $wheres;
-
-        return $this;
+        return parent::whereIn($field, array_map(fn ($v) => $this->transform($v), array_values((array) $values)));
     }
 
     /**
