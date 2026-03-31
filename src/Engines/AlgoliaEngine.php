@@ -117,6 +117,12 @@ class AlgoliaEngine extends Algolia4Engine
                 : '('.implode(' OR ', array_map(fn ($v) => "$field=$v", $values)).')';
         }
 
+        foreach ($builder->whereNotIns as $field => $values) {
+            if (! empty($values)) {
+                $parts[] = 'NOT ('.implode(' OR ', array_map(fn ($v) => "$field=$v", $values)).')';
+            }
+        }
+
         foreach ($builder->wheres as ['field' => $field, 'operator' => $operator, 'value' => $value]) {
             $parts[] = match ($operator) {
                 ':' => "$field: {$value[0]} TO {$value[1]}",

@@ -112,6 +112,19 @@ class Builder extends BaseBuilder
     }
 
     /**
+     * Customize the search adding a where not in clause.
+     *
+     * @param  string $field
+     * @param  array $values
+     *
+     * @return $this
+     */
+    public function whereNotIn($field, $values): self
+    {
+        return parent::whereNotIn($field, array_map(fn ($v) => $this->transform($v), array_values((array) $values)));
+    }
+
+    /**
      * Add an optional filter to the search parameters.
      *
      * @link https://www.algolia.com/doc/api-reference/api-parameters/optionalFilters/
