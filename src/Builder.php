@@ -88,6 +88,9 @@ class Builder extends BaseBuilder
     /**
      * Customize the search adding a where between clause.
      *
+     * Passes an array [min, max] as the where value (Scout v11 normally expects a scalar) so that
+     * AlgoliaEngine::filters() can render Algolia's range syntax: "field: min TO max".
+     *
      * @param  string $field
      * @param  array $values
      *

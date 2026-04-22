@@ -64,29 +64,6 @@ class AlgoliaEngine extends Algolia4Engine
     /**
      * {@inheritdoc}
      */
-    public function search(Builder $builder)
-    {
-        return $this->performSearch($builder, array_filter([
-            'filters' => $this->filters($builder),
-            'hitsPerPage' => $builder->limit,
-        ]));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function paginate(Builder $builder, $perPage, $page)
-    {
-        return $this->performSearch($builder, [
-            'filters' => $this->filters($builder),
-            'hitsPerPage' => $perPage,
-            'page' => $page - 1,
-        ]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function map(Builder $builder, $results, $searchable)
     {
         if (count($results['hits']) === 0) {
